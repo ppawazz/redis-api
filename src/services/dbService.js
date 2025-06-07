@@ -14,4 +14,32 @@ async function getDataFromDB() {
   return rows;
 }
 
-module.exports = { getDataFromDB };
+async function createDataInDB(count) {
+  // Create a dynamic query to insert multiple products at once
+  const insertQuery = `
+    INSERT INTO product (name, description, price, stock)
+    SELECT
+      'Product ' || (i + (SELECT COALESCE(MAX(id), 0) FROM product)) AS name,
+      'Description for product ' || (i + (SELECT COALESCE(MAX(id), 0) FROM product)) AS description,
+      round((random() * 1000 + 100)::numeric, 2) AS price,
+      (random() * 100)::int + 1 AS stock
+    FROM generate_series(1, $1) AS s(i)
+    RETURNING *;
+  `;
+  
+  const { rows } = await pool.query(insertQuery, [count]);
+  return rows;
+}
+
+async function deleteAllDataFromDB() {
+  // Delete all records from the product table
+  return await pool.query('DELETE FROM product');
+}
+
+async function countDataFromDB() {
+  // Count all records in the product table
+  const result = await pool.query('SELECT COUNT(*) FROM product');
+  return parseInt(result.rows[0].count);
+}
+
+module.exports = { getDataFromDB, createDataInDB, deleteAllDataFromDB, countDataFromDB };
