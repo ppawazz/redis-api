@@ -24,7 +24,7 @@ async function createData(req, res) {
     const count = parseInt(req.params.count) || 10; 
     
     if (count <= 0 || count > 5000) {
-      return res.status(400).json({ message: 'Count must be between 1 and 1000' });
+      return res.status(400).json({ message: 'Count must be between 1 and 5000' });
     }
     
     const createdData = await createDataInDB(count);
