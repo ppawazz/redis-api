@@ -28,6 +28,9 @@ async function createData(req, res) {
         }
         
         const createdData = await createDataInDB(count);
+
+        await setCache('all-data', ''); 
+        
         res.status(201).json({
             message: `Successfully created ${count} new products`,
             count: createdData.length,
@@ -42,6 +45,9 @@ async function createData(req, res) {
 async function deleteAllData(req, res) {
     try {
         const result = await deleteAllDataFromDB();
+
+        await setCache('all-data', '');
+
         res.json({
             message: 'All products have been deleted',
             count: result.rowCount
